@@ -2,6 +2,8 @@ package com.anonymous.zoomexpo
 
 import android.os.Build
 import android.os.Bundle
+import android.app.Activity;
+import android.content.Intent;
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
@@ -9,6 +11,8 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnable
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 
 import expo.modules.ReactActivityDelegateWrapper
+import us.zoom.sdk.ZoomVideoSDK;
+import us.zoom.sdk.ZoomVideoSDKShareHelper;
 
 class MainActivity : ReactActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,6 +22,23 @@ class MainActivity : ReactActivity() {
     setTheme(R.style.AppTheme);
     super.onCreate(null)
   }
+  /**
+   *  Users need to add below to their own project to use sharing.
+   */
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+      super.onActivityResult(requestCode, resultCode, data)
+      if (requestCode == 0 && resultCode == Activity.RESULT_OK) {
+          val intent = Intent(this, NotificationService::class.java)
+          val shareHelper = ZoomVideoSDK.getInstance().shareHelper
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+              startForegroundService(intent)
+          } else {
+              startService(intent)
+          }
+          shareHelper.startShareScreen(data)
+      }
+  }
+
 
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule

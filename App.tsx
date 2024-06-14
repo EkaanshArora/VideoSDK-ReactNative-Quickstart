@@ -45,6 +45,11 @@ const Call = () => {
     });
     listeners.current.push(sessionJoin);
 
+    const onUserShareStatusChanged = zoom.addListener(EventType.onUserShareStatusChanged, async (x, y) => {
+      console.log(x, y);
+    });
+    listeners.current.push(onUserShareStatusChanged);
+
     const userJoin = zoom.addListener(EventType.onUserJoin, async (event) => {
       const { remoteUsers } = event;
       const mySelf = await zoom.session.getMySelf();
@@ -140,16 +145,22 @@ const MuteButtons = ({ isAudioMuted, isVideoMuted }: { isAudioMuted: boolean; is
       : await zoom.audioHelper.muteAudio(mySelf.userId);
   };
 
-  const onPressVideo = async () => {
-    const mySelf = await zoom.session.getMySelf();
-    const videoOn = await mySelf.videoStatus.isOn();
-    videoOn ? await zoom.videoHelper.stopVideo() : await zoom.videoHelper.startVideo();
+  const onPressVideoShare = async () => {
+    const zoomHelper = await zoom.shareHelper;
+    const isOtherSharing = await zoomHelper.isOtherSharing();
+    const isShareLocked = await zoomHelper.isShareLocked();
+    if (isOtherSharing) {
+      console.log("Other is sharing");
+    } else if (isShareLocked) {
+      console.log("Share is locked by host");
+    }
+    await zoom.shareHelper.shareScreen();
   };
   return (
     <View style={styles.buttonHolder}>
       <Button title={isAudioMuted ? "Unmute Audio" : "Mute Audio"} onPress={onPressAudio} />
       <View style={styles.spacer} />
-      <Button title={isVideoMuted ? "Unmute Video" : "Mute Video"} onPress={onPressVideo} />
+      <Button title="Share Screen" onPress={onPressVideoShare} />
     </View>
   );
 };
