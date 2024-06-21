@@ -17,7 +17,9 @@ export default function App() {
   usePermission();
 
   return (
-    <ZoomVideoSdkProvider config={{ appGroupId: "test", domain: "zoom.us", enableLog: true }}>
+    <ZoomVideoSdkProvider
+      config={{ appGroupId: "group.ekaansh.zoomexpo", domain: "zoom.us", enableLog: true }}
+    >
       <SafeAreaView style={styles.safe}>
         <Call />
       </SafeAreaView>
